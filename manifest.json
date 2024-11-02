@@ -23,7 +23,7 @@
 		}
 	],
 	"author": "Radwan Susan",
-	"homepage_url": "https://github.com/RadwanSusan/Claude.ai-Folder-Upload-Chrome-Extention",
+	"homepage_url": "https://github.com/RadwanSusan/Claude-Folder-Upload-Extension",
 	"minimum_chrome_version": "88",
 	"offline_enabled": true,
 	"short_name": "Claude Uploader"
