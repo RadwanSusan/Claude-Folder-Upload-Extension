@@ -1,0 +1,146 @@
+/* styles.css */
+.folder-uploader {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	width: 220px;
+	z-index: 999999;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+		sans-serif;
+}
+.folder-drop-zone {
+	background: rgba(86, 88, 105, 0.95);
+	border: 2px dashed rgba(255, 255, 255, 0.5);
+	border-radius: 12px;
+	padding: 16px;
+	transition: all 0.3s ease;
+	backdrop-filter: blur(5px);
+}
+.folder-drop-zone.dragover {
+	background: rgba(106, 108, 125, 0.95);
+	border-color: white;
+	transform: scale(1.02);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.drop-zone-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+.minimize-btn {
+	background: none;
+	border: none;
+	color: white;
+	cursor: pointer;
+	padding: 4px;
+	opacity: 0.7;
+	transition: opacity 0.2s;
+	font-size: 16px;
+}
+.minimize-btn:hover {
+	opacity: 1;
+}
+.drop-zone-content {
+	color: white;
+	text-align: center;
+}
+.drop-icon {
+	width: 40px;
+	height: 40px;
+	margin: 10px auto;
+	opacity: 0.9;
+	transition: transform 0.3s ease;
+}
+.dragover .drop-icon {
+	transform: scale(1.1);
+}
+.drop-text {
+	font-size: 14px;
+	margin: 8px 0;
+	line-height: 1.4;
+}
+.file-stats {
+	font-size: 12px;
+	margin-top: 12px;
+	padding: 8px;
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 6px;
+}
+.progress-bar {
+	width: 100%;
+	height: 4px;
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 2px;
+	margin: 8px 0;
+	overflow: hidden;
+}
+.progress-bar-fill {
+	height: 100%;
+	background: #10a37f;
+	transition: width 0.3s ease;
+}
+.error-message {
+	color: #ff6b6b;
+	font-size: 12px;
+	margin-top: 8px;
+	padding: 8px;
+	background: rgba(255, 0, 0, 0.1);
+	border-radius: 6px;
+	animation: fadeIn 0.3s ease;
+}
+.success-message {
+	color: #10a37f;
+	font-size: 12px;
+	margin-top: 8px;
+	padding: 8px;
+	background: rgba(16, 163, 127, 0.1);
+	border-radius: 6px;
+	animation: fadeIn 0.3s ease;
+}
+.minimized {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+.tooltip {
+	position: absolute;
+	background: rgba(0, 0, 0, 0.8);
+	color: white;
+	padding: 4px 8px;
+	border-radius: 4px;
+	font-size: 12px;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.2s;
+	white-space: nowrap;
+}
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+.file-type-badge {
+	display: inline-block;
+	padding: 2px 6px;
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 3px;
+	font-size: 10px;
+	margin-right: 4px;
+	margin-bottom: 4px;
+}
+.upload-info {
+	font-size: 11px;
+	color: rgba(255, 255, 255, 0.7);
+	margin-top: 8px;
+}

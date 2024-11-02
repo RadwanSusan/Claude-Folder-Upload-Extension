@@ -1,0 +1,17 @@
+{
+	"manifest_version": 3,
+	"name": "Claude Project Folder Uploader",
+	"description": "Upload entire folders to Claude.ai projects with advanced features",
+	"version": "1.0",
+	"icons": {
+		"48": "icons/claude_app_icon.png"
+	},
+	"permissions": ["activeTab", "storage"],
+	"content_scripts": [
+		{
+			"matches": ["https://claude.ai/project/*"],
+			"css": ["styles.css"],
+			"js": ["content.js"]
+		}
+	]
+}
