@@ -628,6 +628,10 @@ class ClaudeFolderUploader {
 		if (!hasValidContent) {
 			item.classList.add('empty-directory');
 		}
+		if (hasValidContent) {
+			item.classList.add('selected');
+			this.state.selectedDirectories.add(dir.path);
+		}
 		const fileCount = dir.fileCount;
 		const totalSize =
 			this.calculateTotalSize(dir.files) +
@@ -636,28 +640,28 @@ class ClaudeFolderUploader {
 				0,
 			);
 		item.innerHTML = `
-          <label class="directory-checkbox-wrapper">
-              <input type="checkbox" class="directory-checkbox" ${
-						hasValidContent ? '' : 'disabled'
-					}>
-              <span class="checkbox-custom"></span>
-          </label>
-          <div class="directory-content">
-              <div class="directory-name">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v11z"/>
-                  </svg>
-                  ${this.escapeHtml(dir.name)}
-              </div>
-              <div class="directory-info">
-                  ${
+			 <label class="directory-checkbox-wrapper">
+				  <input type="checkbox" class="directory-checkbox"
+						${hasValidContent ? 'checked' : ''}
+						${hasValidContent ? '' : 'disabled'}>
+				  <span class="checkbox-custom"></span>
+			 </label>
+			 <div class="directory-content">
+				  <div class="directory-name">
+						<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+							 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v11z"/>
+						</svg>
+						${this.escapeHtml(dir.name)}
+				  </div>
+				  <div class="directory-info">
+						${
 							hasValidContent
 								? `${fileCount} files (${utils.formatSize(totalSize)})`
 								: 'Empty'
 						}
-              </div>
-          </div>
-      `;
+				  </div>
+			 </div>
+		`;
 		const checkbox = item.querySelector('.directory-checkbox');
 		if (checkbox) {
 			checkbox.addEventListener('change', () => {
@@ -862,6 +866,43 @@ class ClaudeFolderUploader {
 			subtree: true,
 		});
 	}
+	async processDroppedItems(rootEntries) {
+		const processedItems = [];
+		for (const rootEntry of rootEntries) {
+			if (rootEntry.entry.isDirectory) {
+				await this.fileFilter.loadGitignore(rootEntry.entry);
+				if (
+					!this.fileFilter.shouldExcludeFolder(rootEntry.entry.fullPath)
+				) {
+					const dirInfo = await this.scanDirectory(rootEntry.entry, true);
+					if (dirInfo.fileCount > 0) {
+						processedItems.push(dirInfo);
+					}
+				}
+			} else if (rootEntry.entry.isFile) {
+				const file = await this.getFileInfo(rootEntry.entry);
+				if (this.fileFilter.isAllowedFile(file)) {
+					processedItems.push({
+						entry: rootEntry.entry,
+						path: rootEntry.entry.fullPath,
+						name: rootEntry.entry.name,
+						files: [file],
+						subdirs: [],
+						fileCount: 1,
+						totalSize: file.size,
+						isRoot: true,
+						level: 0,
+					});
+				} else {
+					this.state.invalidFiles.push(file.name);
+				}
+			}
+		}
+		if (processedItems.length === 0) {
+			throw new Error('No valid files found in the dropped items');
+		}
+		this.showDirectorySelection(processedItems);
+	}
 	async handleDrop(e) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -879,11 +920,12 @@ class ClaudeFolderUploader {
 			if (!entries.length) {
 				throw new Error('No valid items found in drop');
 			}
-			const rootEntry = entries.find((entry) => entry.isDirectory);
-			if (!rootEntry) {
-				throw new Error('Please drop a folder');
-			}
-			await this.processDroppedDirectory(rootEntry);
+			const rootEntries = entries.map((entry) => ({
+				entry,
+				isRoot: true,
+				path: entry.name,
+			}));
+			await this.processDroppedItems(rootEntries);
 		} catch (error) {
 			this.showError(error.message);
 			console.error('Drop handling error:', error);
@@ -1032,27 +1074,52 @@ class ClaudeFolderUploader {
       `;
 		return noContent;
 	}
-	showDirectorySelection(rootDirectory) {
+	createRootItemInfo(rootItem) {
+		const rootInfo = document.createElement('div');
+		rootInfo.className = 'root-directory-info';
+		const itemType = rootItem.entry.isDirectory ? 'Directory' : 'File';
+		const iconPath = rootItem.entry.isDirectory
+			? '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v11z"/>'
+			: '<path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>';
+		rootInfo.innerHTML = `
+			 <div class="root-files-header">
+				  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+						${iconPath}
+				  </svg>
+				  Root ${itemType}: ${this.escapeHtml(rootItem.name)}
+			 </div>
+			 <div class="root-files-count">
+				  ${rootItem.files.length} files (${utils.formatSize(
+			this.calculateTotalSize(rootItem.files),
+		)})
+			 </div>
+		`;
+		return rootInfo;
+	}
+	showDirectorySelection(rootItems) {
 		const dirList = this.elements.directoryList;
 		dirList.innerHTML = '';
 		this.state.selectedDirectories.clear();
 		const fragment = document.createDocumentFragment();
-		if (rootDirectory.files.length > 0) {
-			fragment.appendChild(this.createRootDirectoryInfo(rootDirectory));
-		}
-		const validDirs = rootDirectory.subdirs
-			.filter((dir) => dir.fileCount > 0)
-			.sort((a, b) => a.name.localeCompare(b.name));
-		validDirs.forEach((dir) => {
-			fragment.appendChild(this.createDirectoryItem(dir));
+		rootItems.forEach((rootItem) => {
+			if (rootItem.files.length > 0) {
+				fragment.appendChild(this.createRootItemInfo(rootItem));
+			}
+			const validDirs = rootItem.subdirs
+				.filter((dir) => dir.fileCount > 0)
+				.sort((a, b) => a.name.localeCompare(b.name));
+			validDirs.forEach((dir) => {
+				fragment.appendChild(this.createDirectoryItem(dir));
+			});
 		});
-		if (validDirs.length === 0 && rootDirectory.files.length === 0) {
+		if (fragment.children.length === 0) {
 			fragment.appendChild(this.createEmptyStateMessage());
 		}
 		dirList.appendChild(fragment);
 		this.updateSelectionCount();
+		this.updateSelectAllButtonText();
 		this.elements.directorySelection.style.display = 'block';
-		this.setupDirectoryActionButtons(rootDirectory);
+		this.setupDirectoryActionButtons(rootItems);
 	}
 	createRootDirectoryInfo(rootDirectory) {
 		const rootInfo = document.createElement('div');
@@ -1110,7 +1177,23 @@ class ClaudeFolderUploader {
 			}`;
 		}
 	}
-	setupDirectoryActionButtons(rootDirectory) {
+	updateSelectAllButtonText() {
+		const selectAllBtn = this.container.querySelector('.select-all-btn');
+		if (!selectAllBtn) return;
+		const dirItems = this.container.querySelectorAll(
+			'.directory-item:not(.empty-directory)',
+		);
+		const allSelected = Array.from(dirItems).every((item) =>
+			this.state.selectedDirectories.has(item.dataset.path),
+		);
+		selectAllBtn.innerHTML = `
+			 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+				  <path d="M20 6L9 17l-5-5"/>
+			 </svg>
+			 ${allSelected ? 'Deselect All' : 'Select All'}
+		`;
+	}
+	setupDirectoryActionButtons(rootItems) {
 		const selectAllBtn = this.container.querySelector('.select-all-btn');
 		const uploadSelectedBtn = this.container.querySelector(
 			'.upload-selected-btn',
@@ -1118,24 +1201,62 @@ class ClaudeFolderUploader {
 		const cancelSelectionBtn = this.container.querySelector(
 			'.cancel-selection-btn',
 		);
-		selectAllBtn?.addEventListener('click', () => this.handleSelectAll());
-		uploadSelectedBtn?.addEventListener('click', () =>
-			this.handleUploadSelected(rootDirectory),
-		);
-		cancelSelectionBtn?.addEventListener('click', () =>
-			this.handleCancelSelection(),
-		);
+		if (selectAllBtn) {
+			selectAllBtn.innerHTML = `
+				  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M20 6L9 17l-5-5"/>
+				  </svg>
+				  Deselect All
+			 `;
+			selectAllBtn.addEventListener('click', () => this.handleSelectAll());
+		}
+		if (uploadSelectedBtn) {
+			uploadSelectedBtn.addEventListener('click', () =>
+				this.handleUploadSelected(rootItems),
+			);
+		}
+		if (cancelSelectionBtn) {
+			cancelSelectionBtn.addEventListener('click', () =>
+				this.handleCancelSelection(),
+			);
+		}
 	}
-	async handleUploadSelected(rootDirectory) {
+	async processSelectedItems(rootItems) {
+		this.state.files = [];
+		rootItems.forEach((rootItem) => {
+			if (rootItem.files.length > 0) {
+				this.state.files.push(...rootItem.files);
+			}
+			rootItem.subdirs.forEach((dir) => {
+				if (this.state.selectedDirectories.has(dir.path)) {
+					this.collectAllFiles(dir);
+				}
+			});
+		});
+		if (this.state.files.length === 0) {
+			this.showError('No files to upload');
+			return;
+		}
+		this.state.totalFiles = this.state.files.length;
+		this.state.isProcessing = true;
+		this.showStats();
+		try {
+			await this.uploadFiles();
+		} catch (error) {
+			this.showError(`Upload failed: ${error.message}`);
+			console.error('Upload error:', error);
+		}
+	}
+	async handleUploadSelected(rootItems) {
 		if (
 			this.state.selectedDirectories.size === 0 &&
-			rootDirectory.files.length === 0
+			!rootItems.some((item) => item.files.length > 0)
 		) {
-			this.showWarning('Please select at least one directory to upload');
+			this.showWarning('Please select at least one item to upload');
 			return;
 		}
 		this.elements.directorySelection.style.display = 'none';
-		await this.processSelectedDirectories(rootDirectory);
+		await this.processSelectedItems(rootItems);
 	}
 	showMessage(type, message, duration = 5000) {
 		const existingMessage = this.container.querySelector(`.${type}-message`);
