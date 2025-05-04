@@ -352,6 +352,7 @@ class FileFilter {
 		'.cache',
 		'.npm',
 		'.yarn',
+		'__pycache__',
 	]);
 	constructor() {
 		this.gitignorePatterns = [];
