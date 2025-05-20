@@ -12,7 +12,7 @@
 		{
 			"matches": ["https://claude.ai/project/*"],
 			"css": ["styles.css"],
-			"js": ["content.js"],
+			"js": ["config.js", "content.js"],
 			"run_at": "document_end"
 		}
 	],

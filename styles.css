@@ -464,3 +464,457 @@
 		stroke: CanvasText;
 	}
 }
+
+/* Settings Button in Header */
+.drop-zone-header .settings-btn {
+	background: rgba(255, 255, 255, 0.1);
+	border: none;
+	color: var(--text-primary);
+	cursor: pointer;
+	padding: 6px;
+	margin-left: 8px; /* Space from minimize button */
+	border-radius: var(--border-radius-sm);
+	transition: var(--transition-fast);
+}
+.drop-zone-header .settings-btn:hover {
+	background: rgba(255, 255, 255, 0.2);
+	transform: translateY(-1px);
+}
+.drop-zone-header .settings-btn svg {
+	display: block;
+	width: 14px; /* Consistent with minimize button's svg */
+	height: 14px; /* Consistent with minimize button's svg */
+	stroke: currentColor;
+}
+
+/* Settings Panel */
+.settings-panel {
+	padding: 20px;
+	border-top: 1px solid var(--border-color);
+	margin-top: 15px; /* Space from the header or content above */
+	background: var(--bg-darker); /* Slightly different background */
+	border-radius: var(--border-radius-md);
+	animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	color: var(--text-secondary);
+}
+.settings-panel h3 {
+	margin-top: 0;
+	margin-bottom: 8px;
+	font-size: 16px;
+	color: var(--text-primary);
+	font-weight: 600;
+}
+.settings-panel .settings-description {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+.settings-panel #custom-extensions-area {
+	width: calc(100% - 20px); /* Full width minus padding */
+	padding: 10px;
+	border: 1px solid var(--border-color);
+	background-color: rgba(0,0,0,0.2);
+	color: var(--text-primary);
+	border-radius: var(--border-radius-sm);
+	margin-bottom: 15px;
+	font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+	font-size: 13px;
+	resize: vertical;
+	min-height: 120px;
+	box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+.settings-panel #custom-extensions-area:focus {
+	border-color: var(--primary-color);
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.3);
+}
+
+.settings-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px; /* Spacing between buttons */
+	margin-top: 10px;
+}
+.settings-actions button {
+	padding: 9px 18px;
+	border: none;
+	border-radius: var(--border-radius-sm);
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 500;
+	transition: var(--transition-fast);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+}
+.settings-actions .save-settings-btn {
+	background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+	color: white;
+}
+.settings-actions .save-settings-btn:hover {
+	filter: brightness(1.1);
+	transform: translateY(-1px);
+}
+.settings-actions .reset-settings-btn {
+	background-color: rgba(255, 107, 107, 0.2); /* Reddish transparent */
+	color: var(--error-color);
+	border: 1px solid rgba(255, 107, 107, 0.3);
+}
+.settings-actions .reset-settings-btn:hover {
+	background-color: rgba(255, 107, 107, 0.3);
+	border-color: rgba(255, 107, 107, 0.4);
+	transform: translateY(-1px);
+}
+.settings-actions .close-settings-btn {
+	background-color: rgba(255, 255, 255, 0.1);
+	color: var(--text-secondary);
+	border: 1px solid var(--border-color);
+}
+.settings-actions .close-settings-btn:hover {
+	background-color: rgba(255, 255, 255, 0.15);
+	color: var(--text-primary);
+	transform: translateY(-1px);
+}
+
+/* Hide main drop zone content when settings panel is visible */
+.folder-drop-zone.settings-active .drop-zone-content > *:not(.settings-panel) {
+    display: none !important;
+}
+.folder-drop-zone.settings-active .drop-zone-header .minimize-btn {
+    /* Optionally hide minimize button when settings are open, or keep it */
+}
+
+/* Hidden Files Toggle */
+.hidden-files-toggle-container {
+	margin: 15px 0; /* Space around the toggle */
+	padding: 10px;
+	background-color: rgba(255, 255, 255, 0.05); /* Subtle background */
+	border-radius: var(--border-radius-sm);
+	border: 1px solid var(--border-color);
+	text-align: left; /* Align text to the left */
+}
+
+.hidden-files-label {
+	display: flex; /* Use flexbox for alignment */
+	align-items: center; /* Vertically align items */
+	cursor: pointer;
+	font-size: 14px;
+	color: var(--text-secondary);
+}
+
+.hidden-files-label input[type="checkbox"] {
+	appearance: none; /* Remove default browser styling */
+	width: 16px;
+	height: 16px;
+	border: 2px solid var(--text-tertiary);
+	border-radius: 3px;
+	margin-right: 10px; /* Space between checkbox and text */
+	position: relative;
+	top: -1px; /* Minor vertical adjustment */
+	transition: background-color 0.2s, border-color 0.2s;
+}
+
+.hidden-files-label input[type="checkbox"]:checked {
+	background-color: var(--primary-color);
+	border-color: var(--primary-color);
+}
+
+/* Custom checkmark for checkbox */
+.hidden-files-label input[type="checkbox"]:checked::after {
+	content: '';
+	position: absolute;
+	left: 4px;
+	top: 1px;
+	width: 4px;
+	height: 8px;
+	border: solid white;
+	border-width: 0 2px 2px 0;
+	transform: rotate(45deg);
+}
+
+.hidden-files-label:hover input[type="checkbox"] {
+	border-color: var(--primary-hover);
+}
+
+.hidden-files-note {
+    display: block; /* Make it a block to take its own line */
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 5px; /* Space above the note */
+    padding-left: 28px; /* Align with text after checkbox */
+}
+
+/* Excluded Items Toggle & List */
+.excluded-items-container {
+	margin: 10px 0;
+	padding: 10px;
+	background-color: rgba(255, 255, 255, 0.03); /* Slightly different from hidden files toggle */
+	border-radius: var(--border-radius-sm);
+	border: 1px solid var(--border-color);
+}
+
+.toggle-excluded-btn {
+	background-color: rgba(255, 255, 255, 0.08);
+	color: var(--text-secondary);
+	border: 1px solid var(--border-color);
+	padding: 8px 15px;
+	border-radius: var(--border-radius-sm);
+	cursor: pointer;
+	width: 100%;
+	text-align: left;
+	font-size: 13px;
+	transition: background-color var(--transition-fast);
+	margin-bottom: 5px; /* Space before list appears */
+}
+
+.toggle-excluded-btn:hover:not([disabled]) {
+	background-color: rgba(255, 255, 255, 0.12);
+	color: var(--text-primary);
+}
+
+.toggle-excluded-btn[disabled] {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.excluded-items-list {
+	max-height: 150px; /* Limit height and make scrollable */
+	overflow-y: auto;
+	padding: 10px;
+	background-color: rgba(0, 0, 0, 0.1); /* Darker background for the list */
+	border-radius: var(--border-radius-sm);
+	margin-top: 8px;
+}
+
+.excluded-items-list h4 {
+	margin-top: 0;
+	margin-bottom: 8px;
+	font-size: 14px;
+	color: var(--text-primary);
+	font-weight: 500;
+	border-bottom: 1px solid var(--border-color);
+	padding-bottom: 5px;
+}
+
+.excluded-items-list ul {
+	list-style-type: none;
+	padding-left: 0;
+	margin: 0;
+}
+
+.excluded-item {
+	display: flex;
+	align-items: center;
+	padding: 6px 0;
+	font-size: 12px;
+	color: var(--text-tertiary); /* Dimmer text for excluded items */
+	border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Faint separator */
+}
+.excluded-item:last-child {
+	border-bottom: none;
+}
+
+.excluded-item-icon {
+	margin-right: 8px;
+	flex-shrink: 0;
+}
+.excluded-item-icon svg {
+	width: 14px;
+	height: 14px;
+	stroke: var(--text-tertiary); /* Dimmer icon */
+	display: block;
+}
+
+.excluded-item-path {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	flex-grow: 1;
+	margin-right: 5px;
+}
+
+.excluded-item-reason {
+	font-style: italic;
+	color: var(--text-tertiary);
+	white-space: nowrap;
+	flex-shrink: 0;
+	margin-left: auto; /* Pushes reason to the right if path is short */
+	padding-left: 5px;
+}
+
+/* Concatenate Text Files Button & Modal */
+.directory-actions .combine-btn {
+	background-color: rgba(76, 175, 80, 0.1); /* Greenish transparent */
+	color: #4CAF50; /* Green text */
+	border: 1px solid rgba(76, 175, 80, 0.3);
+}
+.directory-actions .combine-btn:hover:not([disabled]) {
+	background-color: rgba(76, 175, 80, 0.2);
+	border-color: rgba(76, 175, 80, 0.4);
+	color: #5cb85c;
+}
+.directory-actions .combine-btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+/* Styles for #concatenate-modal are similar to #pre-upload-warning-modal */
+/* Ensure modal-content can hold the textarea and info properly */
+#concatenate-modal .modal-content {
+	display: flex;
+	flex-direction: column;
+}
+
+#concatenate-modal #concatenated-text-area {
+	width: calc(100% - 20px); /* Full width minus padding */
+	min-height: 200px; /* Minimum height */
+	max-height: 60vh; /* Max height, then scroll */
+	padding: 10px;
+	margin-top: 10px; /* Space from info */
+	border: 1px solid var(--border-color);
+	background-color: rgba(0,0,0,0.2);
+	color: var(--text-primary);
+	border-radius: var(--border-radius-sm);
+	font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+	font-size: 12px; /* Smaller font for code/text */
+	resize: vertical;
+	box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+#concatenate-modal #concatenated-text-area:focus {
+	border-color: var(--primary-color);
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.3);
+}
+
+.concatenated-info {
+	display: flex;
+	justify-content: space-between;
+	font-size: 12px;
+	color: var(--text-tertiary);
+	padding: 5px 0;
+	border-bottom: 1px solid var(--border-color);
+	margin-bottom: 5px;
+}
+
+/* Pre-Upload Warning Modal */
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000000; /* Ensure it's above everything */
+	backdrop-filter: blur(5px);
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	pointer-events: none;
+}
+.modal-overlay.visible {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.modal-container {
+	background: var(--bg-darker, #2c2f33); /* Fallback color */
+	padding: 25px;
+	border-radius: var(--border-radius-lg, 12px);
+	box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+	width: 90%;
+	max-width: 450px;
+	border: 1px solid var(--border-color, #444);
+	color: var(--text-primary, #fff);
+	transform: scale(0.95);
+	transition: transform 0.3s ease;
+}
+.modal-overlay.visible .modal-container {
+	transform: scale(1);
+}
+
+.modal-title {
+	margin-top: 0;
+	margin-bottom: 15px;
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--text-primary, #fff);
+	border-bottom: 1px solid var(--border-color, #444);
+	padding-bottom: 10px;
+}
+
+.modal-content p {
+	margin-bottom: 10px;
+	font-size: 14px;
+	line-height: 1.5;
+	color: var(--text-secondary, #ccc);
+}
+.modal-content p strong {
+	color: var(--text-primary, #fff);
+	font-weight: 500;
+}
+
+.upload-summary-list {
+	list-style-type: none;
+	padding-left: 0;
+	margin: 10px 0 15px 0;
+	font-size: 14px;
+}
+.upload-summary-list li {
+	padding: 5px 0;
+	color: var(--text-secondary, #ccc);
+}
+
+.warning-message-text {
+	background-color: rgba(255, 165, 2, 0.1); /* Warning color background */
+	border: 1px solid rgba(255, 165, 2, 0.3);
+	color: var(--warning-color, #ffa502); /* Actual text color */
+	padding: 10px;
+	border-radius: var(--border-radius-sm, 8px);
+	font-size: 13px;
+	line-height: 1.4;
+	margin-top: 10px;
+}
+.warning-message-text.no-warning { /* Style for when there's no specific warning */
+	background-color: rgba(16, 163, 127, 0.1); /* Primary color background */
+	border: 1px solid rgba(16, 163, 127, 0.2);
+	color: var(--primary-color, #10a37f);
+}
+
+
+.modal-actions {
+	margin-top: 20px;
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+}
+
+.modal-button {
+	padding: 10px 20px;
+	border: none;
+	border-radius: var(--border-radius-sm, 8px);
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 500;
+	transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+.modal-button.primary {
+	background-color: var(--primary-color, #10a37f);
+	color: white;
+}
+.modal-button.primary:hover {
+	background-color: var(--primary-hover, #0e906f);
+	transform: translateY(-1px);
+}
+.modal-button.secondary {
+	background-color: rgba(255, 255, 255, 0.1);
+	color: var(--text-secondary, #ccc);
+	border: 1px solid var(--border-color, #444);
+}
+.modal-button.secondary:hover {
+	background-color: rgba(255, 255, 255, 0.15);
+	color: var(--text-primary, #fff);
+}
