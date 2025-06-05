@@ -464,3 +464,21 @@
 		stroke: CanvasText;
 	}
 }
+
+/* Added styles for the reset button */
+.reset-upload-btn {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.reset-upload-btn:hover {
+  background-color: #45a049;
+}

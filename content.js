@@ -1323,6 +1323,20 @@ class ClaudeFolderUploader {
 			this.showSuccess(
 				`Successfully uploaded ${this.state.uploadedFiles} files`,
 			);
+
+			// Add "Upload Another Folder" button
+			if (!this.elements.dropZoneContent.querySelector('.reset-upload-btn')) {
+				const resetButton = document.createElement('button');
+				resetButton.textContent = 'Upload Another Folder';
+				resetButton.className = 'reset-upload-btn';
+				resetButton.addEventListener('click', () => {
+					this.resetState();
+					resetButton.remove();
+					// Ensure drop text and upload info are visible (already handled by resetState)
+				});
+				this.elements.dropZoneContent.appendChild(resetButton);
+			}
+
 		} finally {
 			this.state.isProcessing = false;
 		}
@@ -1472,8 +1486,33 @@ class ClaudeFolderUploader {
 			uploadedFiles: 0,
 			invalidFiles: [],
 			ignoredFiles: [],
+      isProcessing: false, // Added
 		});
-		this.updateStats();
+    this.state.directories.clear(); // Added
+    this.state.selectedDirectories.clear(); // Added
+
+    if (this.elements.stats) { // Added check for existence
+      this.elements.stats.style.display = 'none'; // Added
+    }
+    if (this.elements.directorySelection) { // Added check for existence
+      this.elements.directorySelection.style.display = 'none'; // Added
+    }
+    if (this.elements.dropZone) { // Added check for existence
+      this.elements.dropZone.classList.remove('is-processing'); // Added
+    }
+
+    // Ensure initial UI elements are visible and others hidden
+    if (this.elements.dropZoneContent) { // Added check for existence
+      const dropText = this.elements.dropZoneContent.querySelector('.drop-text');
+      if (dropText) {
+        dropText.style.display = 'block'; // Added
+      }
+      const uploadInfo = this.elements.dropZoneContent.querySelector('.upload-info');
+      if (uploadInfo) {
+        uploadInfo.style.display = 'block'; // Added
+      }
+    }
+    this.updateStats(); // Kept existing call
 	}
 }
 if (document.readyState === 'loading') {
